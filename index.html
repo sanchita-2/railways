@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Indian Rail QR Inspection Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="navbar">
+      <div class="logo">🚄 Indian Rail Operations</div>
+      <nav>
+        <ul>
+          <li class="active">Dashboard</li>
+          <li>Scan Tool</li>
+          <li>Asset History</li>
+          <li>Alerts</li>
+          <li>Reports</li>
+        </ul>
+      </nav>
+      <button class="scan-btn">Scan QR</button>
+    </header>
+
+    <main class="dashboard">
+      <section class="card stats">
+        <h2>Interactive Status Dashboard</h2>
+        <div class="stats-grid">
+          <div class="stat-circle">
+            <div class="circle">
+              <span id="safetyScore">92</span>
+              <small>/100</small>
+            </div>
+            <p>Safety Index Score</p>
+          </div>
+          <div class="stat-box">
+            <h3>Total Assets Logged</h3>
+            <p id="totalAssets">1,873</p>
+          </div>
+          <div class="stat-box">
+            <h3>Pending Inspections</h3>
+            <p id="pendingInspections">5</p>
+          </div>
+          <div class="stat-box">
+            <h3>System Efficiency</h3>
+            <p id="efficiency">+15% QoQ</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card predictive">
+        <h2>Predictive Maintenance</h2>
+        <ul id="maintenanceList">
+          <li><span>Track 3, Main B:</span> High probability of bolt failure <span class="alert red">High</span></li>
+          <li><span>Bridge BE7:</span> Possible leakage detection <span class="alert yellow">Medium</span></li>
+          <li><span>Coach 12:</span> Axle misalignment <span class="alert green">Low</span></li>
+        </ul>
+      </section>
+
+      <section class="card trends">
+        <h2>Efficiency Trends</h2>
+        <canvas id="trendChart"></canvas>
+      </section>
+
+      <section class="card feed">
+        <h2>Recent Activity Feed</h2>
+        <div id="activityFeed">
+          <p>[10:35] Inspection logged for Train 22891</p>
+          <p>[10:40] AI detected abnormal vibration on fitting 4C</p>
+          <p>[10:45] Technician assigned for recheck</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
