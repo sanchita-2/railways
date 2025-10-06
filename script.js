@@ -39,7 +39,7 @@ async function loadDashboard() {
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("Error loading dashboard:", err);
   }
 }
 
@@ -57,7 +57,7 @@ async function loadActivity() {
       feed.appendChild(p);
     });
   } catch (err) {
-    console.error(err);
+    console.error("Error loading activity:", err);
   }
 }
 
@@ -66,42 +66,78 @@ function animateScore(target) {
   let score = 0;
   const el = document.getElementById('safetyScore');
   const interval = setInterval(() => {
-    if(score >= target){ clearInterval(interval); return; }
+    if (score >= target) {
+      clearInterval(interval);
+      return;
+    }
     el.textContent = ++score;
   }, 20);
 }
 
-// --- QR Scan Button ---
-document.querySelector('.scan-btn').addEventListener('click', () => {
-  const html5QrCode = new Html5Qrcode("reader");
+// --- QR Scanner Logic ---
+let html5QrCode = null;
+let isScanning = false;
 
-  html5QrCode.start(
-    { facingMode: "environment" },
-    { fps: 10, qrbox: 250 },
-    async (qrCodeMessage) => {
-      // Stop scanning after successful scan
-      html5QrCode.stop();
+const scanBtn = document.querySelector('.scan-btn');
+const readerDiv = document.getElementById('reader');
 
-      try {
-        await fetch('http://localhost:5000/api/scan', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ assetId: qrCodeMessage, status: "Inspected" })
-        });
+scanBtn.addEventListener('click', async () => {
+  if (!isScanning) {
+    try {
+      if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
 
-        // Refresh dashboard stats and activity feed
-        loadDashboard();
-        loadActivity();
+      readerDiv.style.display = "block";
+      readerDiv.style.margin = "20px auto";
+      scanBtn.textContent = "Stop Scanning";
+      isScanning = true;
 
-      } catch (err) {
-        console.error(err);
-        alert("Error logging asset!");
-      }
-    },
-    (errorMessage) => {
-      console.log("Scanning...", errorMessage);
+      await html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 250 },
+        async (decodedText) => {
+          alert(`✅ QR Detected: ${decodedText}`);
+
+          // Stop camera
+          await html5QrCode.stop();
+          html5QrCode.clear();
+          readerDiv.style.display = "none";
+          scanBtn.textContent = "Scan QR";
+          isScanning = false;
+
+          // Log scan to backend
+          try {
+            await fetch('http://localhost:5000/api/scan', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ assetId: decodedText, status: "Inspected" })
+            });
+            loadDashboard();
+            loadActivity();
+          } catch (err) {
+            console.error("Error logging scan:", err);
+            alert("Error logging scan!");
+          }
+        },
+        (errorMessage) => {
+          // Optional: log scanning process
+          console.log("Scanning...", errorMessage);
+        }
+      );
+    } catch (err) {
+      console.error("Error starting scanner:", err);
+      alert("Camera access failed! Make sure it's not in use by another app.");
     }
-  );
+  } else {
+    try {
+      await html5QrCode.stop();
+      html5QrCode.clear();
+      readerDiv.style.display = "none";
+      scanBtn.textContent = "Scan QR";
+      isScanning = false;
+    } catch (err) {
+      console.error("Error stopping scanner:", err);
+    }
+  }
 });
 
 // --- Initial Load ---
