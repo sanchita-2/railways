@@ -5,11 +5,11 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const app = express();
-const PORT = 5000;
+const PORT = 5500;
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static(__dirname));
+app.use(express.static('public'));
 
 // MySQL connection
 const db = mysql.createConnection({
@@ -47,12 +47,23 @@ app.get('/api/stats', (req, res) => {
 
 // Scan QR (log asset)
 app.post('/api/scan', (req, res) => {
+  console.log("Received scan POST request:", req.body); // log incoming data
   const { assetId, status } = req.body;
+
+  if (!assetId || !status) {
+    console.log("Missing assetId or status");
+    return res.status(400).json({ message: "assetId or status missing" });
+  }
+
   db.query(
     'INSERT INTO assets (asset_id, status) VALUES (?, ?)',
     [assetId, status],
     (err, result) => {
-      if (err) return res.status(500).json(err);
+      if (err) {
+        console.error("MySQL insert error:", err); // log exact error
+        return res.status(500).json(err);
+      }
+      console.log("Insert successful:", result);
       res.json({ message: 'Asset logged', assetId, id: result.insertId });
     }
   );

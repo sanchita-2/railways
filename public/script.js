@@ -5,7 +5,7 @@ let trendChart;
 // --- Load Dashboard Stats ---
 async function loadDashboard() {
   try {
-    const res = await fetch('http://localhost:5000/api/stats');
+    const res = await fetch('http://localhost:5500/api/stats');
     const data = await res.json();
 
     document.getElementById('totalAssets').textContent = data.totalAssets;
@@ -46,7 +46,7 @@ async function loadDashboard() {
 // --- Load Recent Activity Feed ---
 async function loadActivity() {
   try {
-    const res = await fetch('http://localhost:5000/api/activity');
+    const res = await fetch('http://localhost:5500/api/activity');
     const data = await res.json();
 
     const feed = document.getElementById('activityFeed');
@@ -106,7 +106,7 @@ scanBtn.addEventListener('click', async () => {
 
           // Log scan to backend
           try {
-            await fetch('http://localhost:5000/api/scan', {
+            await fetch('http://localhost:5500/api/scan', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ assetId: decodedText, status: "Inspected" })
